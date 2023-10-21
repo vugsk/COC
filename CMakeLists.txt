@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
+
 project(COC)
 
 ## Curses
@@ -16,7 +17,7 @@ else()
     set(PD_OR_N_CURSES ${CURSES_LIBRARIES})
 endif()
 
-include_directories(includes)
+include_directories(includes/COC)
 set(SRC_ROOT 
     src/MainWindow.cpp 
     src/MainWindow.cpp
@@ -32,7 +33,7 @@ install(TARGETS ${PROJECT_NAME}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(DIRECTORY includes/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 ## ABI version

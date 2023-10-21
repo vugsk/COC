@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <Config.h>
+#include "Config.h"
 
 namespace IOSys {
     inline void print(char_c *text, va_list args, WINDOW *window,  int_c y = 0, int_c x = 0);
