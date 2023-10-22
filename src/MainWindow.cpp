@@ -283,7 +283,7 @@ template<typename T> void Screen::textSelectionTable(const vector<vector<T>> tab
 
 Screen* Screen::createWindow(int_c x, int_c y, int_c width, int_c height) {
     WINDOW* WIN = newwin(y, x, height, width);
-    return new Screen(win, x, y);
+    return new Screen(WIN, x, y);
 }
 
 Screen::Screen(WINDOW* win, int_c x, int_c y)
