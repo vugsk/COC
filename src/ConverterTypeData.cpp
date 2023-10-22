@@ -18,6 +18,6 @@ wstr_c converterStringInWstring(str_c text) {
     return con.from_bytes(text);
 }
 
-template<typename T> size_t_c sizeWchar(T wch) { 
+size_t_c sizeWchar(wchar_t_c wch) { 
     return sizeof(wch) - sizeof(wchar_t_c); 
 }

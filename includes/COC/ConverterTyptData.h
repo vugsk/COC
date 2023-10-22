@@ -17,4 +17,4 @@ typedef const string  str_c;
 wchar_t_c* converterCharInWchar(char_c* ch);
 wstr_c converterStringInWstring(str_c text);
 
-template<typename T> size_t_c sizeWchar(T wch);
+size_t_c sizeWchar(wchar_t_c wch);

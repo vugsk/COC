@@ -10,8 +10,6 @@
 using std::vector;
 using std::pair;
 using std::function;
-using std::string;
-using std::wstring;
 
 typedef const int  int_c;
 typedef const bool bool_c;
