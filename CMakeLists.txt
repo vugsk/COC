@@ -18,11 +18,15 @@ else()
 endif()
 
 include_directories(includes/COC)
+# file(GLOB SRC_ROOT src/*.cpp)
 set(SRC_ROOT 
     src/MainWindow.cpp 
     src/MainWindow.cpp
     src/ConverterTypeData.cpp
 )
+
+# add_executable(COC ${SRC_ROOT})
+# target_link_libraries(COC ${PD_OR_N_CURSES})
 
 ## building project
 add_library(${PROJECT_NAME} ${SRC_ROOT})

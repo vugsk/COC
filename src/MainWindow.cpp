@@ -4,17 +4,18 @@
 #include "Config.h"
 #include "ConverterTyptData.h"
 #include "ErrorTest.h"
+#include <curses.h>
 
 
 
 inline void IOSys::print(char_c *text, va_list args, WINDOW *window,  int_c y, int_c x) {
-    move(y, x);
+    wmove(window, y, x);
     vw_printw(window, text, args);
     wrefresh(window);
 }
 
 inline void IOSys::scan(char_c *str, va_list args, WINDOW *window,  int_c y, int_c x) {
-    move(y, x);
+    wmove(window, y, x);
     vw_scanw(window, str, args);
 }
 
