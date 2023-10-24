@@ -17,7 +17,3 @@ wstr_c converterStringInWstring(str_c text) {
     std::wstring_convert<std::codecvt_utf8<wchar_t>> con;
     return con.from_bytes(text);
 }
-
-size_t_c sizeWchar(wchar_t_c wch) { 
-    return sizeof(wch) - sizeof(wchar_t_c); 
-}

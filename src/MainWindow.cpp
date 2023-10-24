@@ -2,66 +2,102 @@
 #include "MainWindow.h"
 
 #include "Config.h"
-#include "ConverterTyptData.h"
 #include "ErrorTest.h"
-#include <curses.h>
 
-
-
-inline void IOSys::print(char_c *text, va_list args, WINDOW *window,  int_c y, int_c x) {
+inline void IOSys::print(
+    char_c *text, va_list args, WINDOW *window,  int_c y, int_c x)
+{
     wmove(window, y, x);
     vw_printw(window, text, args);
     wrefresh(window);
 }
 
-inline void IOSys::scan(char_c *str, va_list args, WINDOW *window,  int_c y, int_c x) {
+inline void IOSys::scan(
+    char_c *str, va_list args, WINDOW *window,  int_c y, int_c x)
+{
     wmove(window, y, x);
     vw_scanw(window, str, args);
 }
 
 using std::exit;
 
-inline bool_c conditionMoreOrLess(int_c cheackNum, int_c maxNumOrMinNum, bool_c sign) {
+inline bool_c conditionMoreOrLess(
+    int_c cheackNum, int_c maxNumOrMinNum, bool_c sign)
+{
     return sign ? cheackNum > maxNumOrMinNum : cheackNum < maxNumOrMinNum; 
 }
 
-inline bool_c ConditionWithAnOrOrAndSign(int_c cheackNum, int_c minNum, int_c maxNum, bool_c sign) {
+inline bool_c ConditionWithAnOrOrAndSign(
+    int_c cheackNum, int_c minNum, int_c maxNum, bool_c sign)
+{
     return sign ? conditionMoreOrLess(cheackNum, minNum, false) && conditionMoreOrLess(cheackNum, maxNum, true) : 
                   conditionMoreOrLess(cheackNum, minNum, false) || conditionMoreOrLess(cheackNum, maxNum, true);
 }
 
 template <typename T1, typename T2, typename T3, typename T4>
-void Screen::cheackError(function<void(T1, T2, T3, T4)> func, T1 t1, T2 t2, T3 t3, T4 t4) {
-    try {
+void Screen::cheackError(
+    function<void(T1, T2, T3, T4)> func, T1 t1, T2 t2, T3 t3, T4 t4)
+{
+    try
+    {
         func(t1, t2, t3, t4);
-    } catch (exception &ex) {
+    } 
+    catch (exception &ex)
+    {
         print("%s \n", ex.what());
         exit(EXIT_FAILURE);
     }
 }
 
-void Screen::ErrorSize(int_c size, bool_c ifSizeXY, int_c sizeAdditionally) {
-    cheackError<int_c, bool_c, int_c, int_c>([this](int_c size, bool_c ifSizeXY, int_c sizeAdditionally, int_c io) {
+void Screen::ErrorSize(int_c size, bool_c ifSizeXY, int_c sizeAdditionally)
+{
+    cheackError<int_c, bool_c, int_c, int_c>(
+        [this](int_c size, bool_c ifSizeXY, int_c sizeAdditionally, 
+        int_c io) 
+    {
+        
         if (ifSizeXY) {
-            if (sizeAdditionally < -1 || !sizeAdditionally) throw ErrorSizeLessThanZero();
+            if (sizeAdditionally < -1 || !sizeAdditionally) 
+            {
+                throw ErrorSizeLessThanZero();
+            }
         }
-        if (size < -1 || !size) throw ErrorSizeLessThanZero(); 
+        if (size < -1 || !size) 
+        {
+            throw ErrorSizeLessThanZero();
+        } 
+    
     }, size, ifSizeXY, sizeAdditionally, 0);
 }
 
-void Screen::ErrorXY(int_c x, int_c y, int_c finishX, int_c finishY) {
-    cheackError<int_c, int_c, int_c, int_c>([this](int_c x, int_c y, int_c finishX, int_c finishY) {
-        if (finishX && finishY) {
+void Screen::ErrorXY(int_c x, int_c y, int_c finishX, int_c finishY)
+{
+    cheackError<int_c, int_c, int_c, int_c>(
+        [this](int_c x, int_c y, int_c finishX, int_c finishY) 
+    {
+        if (finishX && finishY)
+        {
             if (conditionMoreOrLess(finishX, this->x, true) || 
-                conditionMoreOrLess(finishY, this->y, true)) throw ::ErrorXY();
+                conditionMoreOrLess(finishY, this->y, true))
+            {
+                throw ::ErrorXY();
+            }
         }
         if (ConditionWithAnOrOrAndSign(x, -1, this->x, true) ||
-            ConditionWithAnOrOrAndSign(y, -1, this->y, true)) throw ::ErrorXY();
+            ConditionWithAnOrOrAndSign(y, -1, this->y, true))
+        {
+            throw ::ErrorXY();
+        }
     }, x, y, finishX, finishY);
 }
 
-template<typename T> void Screen::ErrorVector(const vector<T> vec, bool_c ifT_vector) {
-    cheackError<const vector<T>, bool_c, int_c, int_c>([this](const vector<T> vec, bool_c ifT_vector, int_c finishX, int_c finishY) {
+template<typename T> void Screen::ErrorVector(
+    const vector<T> vec, bool_c ifT_vector)
+{
+    cheackError<const vector<T>, bool_c, int_c, int_c>(
+        [this](const vector<T> vec, bool_c ifT_vector, int_c finishX, 
+        int_c finishY)
+    {
         if (ifT_vector) {
             for (size_t i = 0; i < vec.size(); i++) {
                 if (vec[i].empty()) throw ErrorVectorEmpty(); 
@@ -95,7 +131,8 @@ void Screen::attrOn(int_c attr) { wattron(win, attr); }
 void Screen::attrOff(int_c attr) { wattroff(win, attr); }
 void Screen::keypad(bool_c key) { ::keypad(win, key); }
 
-void Screen::cheackColorSupport() {
+void Screen::cheackColorSupport()
+{
     try {
         if (!has_colors()) throw ErrorColorSupport();
     } catch (exception &ex) {
@@ -104,76 +141,116 @@ void Screen::cheackColorSupport() {
     }
 }
 
-void Screen::print(int_c x, int_c y, char_c* text, ...) {
+void Screen::print(int_c x, int_c y, char_c* text, ...)
+{
     va_list args;
     va_start(args, text);
     IOSys::print(text, args, win, y, x);
     va_end(args);
 }
 
-void Screen::print(char_c* text, ...) {
+void Screen::print(char_c* text, ...)
+{
     va_list args;   
     va_start(args, text);
     IOSys::print(text, args, win);
     va_end(args);
 }
 
-void Screen::addChar(char_c ch, int_c x, int_c y) {
+void Screen::addChar(char_c ch, int_c x, int_c y)
+{
     ErrorXY(x, y);
     mvwaddch(win, y, x, ch);
 }
 
-void Screen::addStr(char_c *str, int_c x, int_c y) {
+void Screen::addStr(char_c *str, int_c x, int_c y)
+{
     ErrorXY(x, y);
     mvwaddstr(win, y, x, str);
 }
 
-void Screen::scan(char_c *str, ...) {
+void Screen::scan(char_c *str, ...)
+{
     va_list args;
     va_start(args, str);
     IOSys::scan(str, args, win);
     va_end(args);
 }
 
-void Screen::scan(int_c x, int_c y, char_c *str, ...) {
+void Screen::scan(int_c x, int_c y, char_c *str, ...)
+{
     va_list args;
     va_start(args, str);
     IOSys::scan(str, args, win, y, x);
     va_end(args);
 }
 
-int_c Screen::ifTheWsOrAdButtonIsPressed(int_vec_c button, int highlight, int size) {
-    if ((_choice == button[0]) || (_choice == button[1])) {
-        if (!size) {
-            if (highlight == -1) return 0;
+int_c Screen::ifTheWsOrAdButtonIsPressed(
+    int_vec_c button, int highlight, int size)
+{
+    if ((_choice == button[0]) || (_choice == button[1]))
+    {
+        if (!size)
+        {
+            if (highlight == -1) 
+            {
+                return 0;
+            }
             return --highlight;
-        } else {
-            if (highlight == size) return size--;
+        }
+        else
+        {
+            if (highlight == size) 
+            {
+                return size--;
+            }
             return ++highlight; 
         }
     }
 
     if (highlight == size) {
-        if (!size) return 0;
-        else return size--;
+        if (!size) 
+        {
+            return 0;
+        }
+        else 
+        {
+            return size--;
+        }
     }
 
     return highlight;
 }
 
-void Screen::wsOrAdButton(int_c size, bool_c WS_or_AD) {
+void Screen::wsOrAdButton(int_c size, bool_c WS_or_AD)
+{
     ErrorSize(size);
     getChar();
 
     int_pair_vec button_WS_or_AD;
-    if (WS_or_AD) button_WS_or_AD = {{KEY_W, UP}, {KEY_S, DOWN}};
-    else          button_WS_or_AD = {{KEY_A, LEFT}, {KEY_D, RIGHT}};
-
-    _highlight = ifTheWsOrAdButtonIsPressed(button_WS_or_AD.second, _highlight, size);
-    _highlight = ifTheWsOrAdButtonIsPressed(button_WS_or_AD.first, _highlight);
+    if (WS_or_AD) 
+    {
+        button_WS_or_AD = {
+            {KEY_W, UP}, 
+            {KEY_S, DOWN}
+        };
+    }
+    else 
+    {
+        button_WS_or_AD = {
+            {KEY_A, LEFT}, 
+            {KEY_D, RIGHT}
+        };
+    }
+    
+    _highlight = ifTheWsOrAdButtonIsPressed(button_WS_or_AD.second, 
+        _highlight, size);
+    _highlight = ifTheWsOrAdButtonIsPressed(button_WS_or_AD.first, 
+        _highlight);
 }
 
-void Screen::wasdButton(int_c size_x, int_c size_y) {
+void Screen::wasdButton(int_c size_x, int_c size_y)
+{
     ErrorSize(size_x, true, size_y);
     getChar();
 
@@ -182,23 +259,31 @@ void Screen::wasdButton(int_c size_x, int_c size_y) {
         {{KEY_A, LEFT}, {KEY_D, RIGHT}}
     };
 
-    _highlightY = ifTheWsOrAdButtonIsPressed(button_WASD[0].second, _highlightY, size_y);
-    _highlightY = ifTheWsOrAdButtonIsPressed(button_WASD[0].first, _highlightY);
+    _highlightY = ifTheWsOrAdButtonIsPressed(button_WASD[0].second, 
+        _highlightY, size_y);
+    _highlightY = ifTheWsOrAdButtonIsPressed(button_WASD[0].first, 
+        _highlightY);
 
-    _highlightX = ifTheWsOrAdButtonIsPressed(button_WASD[1].second, _highlightX, size_x);
-    _highlightX = ifTheWsOrAdButtonIsPressed(button_WASD[1].first, _highlightX);
+    _highlightX = ifTheWsOrAdButtonIsPressed(button_WASD[1].second, 
+        _highlightX, size_x);
+    _highlightX = ifTheWsOrAdButtonIsPressed(button_WASD[1].first, 
+        _highlightX);
 }
 
-void Screen::clear(int_c start_x, int_c start_y, int_c finish_x, int_c finish_y) {
+void Screen::clear(int_c start_x, int_c start_y, int_c finish_x, int_c finish_y)
+{
     ErrorXY(start_x, start_y, finish_x, finish_y);
-    for (int i = start_y; i <= finish_y; i++) {
-        for (int j = start_x; j <= finish_x; j++) {
+    for (int i = start_y; i <= finish_y; i++)
+    {
+        for (int j = start_x; j <= finish_x; j++)
+        {
             addChar(' ', j, i);
         }
     }
 }
 
-void Screen::drawWall(int wall_x, int wall_y, bool_c drawWallXOrY) {
+void Screen::drawWall(int wall_x, int wall_y, bool_c drawWallXOrY)
+{
     ErrorXY(wall_x, wall_y);
 
     char_c* WALL;
@@ -207,13 +292,16 @@ void Screen::drawWall(int wall_x, int wall_y, bool_c drawWallXOrY) {
 
     int numXOrY;
 
-    if (drawWallXOrY) {
+    if (drawWallXOrY) 
+    {
         WALL = WALL_Y_PERPENDICULAR;
         WALL_90 = WALL_Y_ANGLE_UNDER_90_DOWN;
         WALL_180 = WALL_Y_ANGLE_UNDER_90_TOP;
         
         numXOrY = y;
-    } else {
+    }
+    else 
+    {
         WALL = WALL_X_IN_PARALLEL;
         WALL_90 = WALL_X_ANGLE_UNDER_90_LEFT;
         WALL_180 = WALL_X_ANGLE_UNDER_90_RIGHT;
@@ -226,17 +314,28 @@ void Screen::drawWall(int wall_x, int wall_y, bool_c drawWallXOrY) {
         wall_y = temp;
     }
 
-    for (int i = numXOrY - wall_x; i < numXOrY; i++) {
-        if (i != numXOrY - 1) {
-            if (drawWallXOrY) print(wall_x, i, WALL);
-            else              print(i, wall_y, WALL);
+    for (int i = numXOrY - wall_x; i < numXOrY; i++)
+    {
+        if (i != numXOrY - 1)
+        {
+            if (drawWallXOrY) 
+            {
+                print(wall_x, i, WALL);
+            }
+            else 
+            {
+                print(i, wall_y, WALL);
+            }
         }
     }
 
-    if (drawWallXOrY) {
+    if (drawWallXOrY)
+    {
         print(wall_x, y - wall_y, WALL_90);
         print(wall_x, y - 1, WALL_180);
-    } else {
+    } 
+    else
+    {
         print(x - wall_x, wall_y, WALL_90);
         print(x - 1, wall_y, WALL_180);
     }
@@ -244,55 +343,154 @@ void Screen::drawWall(int wall_x, int wall_y, bool_c drawWallXOrY) {
 
 
 
-void Screen::textSelection(str_vec_c vec, int_c x, int_c y) {
+void Screen::textSelection(str_vec_c vec, int_c x, int_c y)
+{
     ErrorVector(vec, false);
     ErrorXY(x, y);
 
-    for (size_t i = 0; i < vec.size(); i++) {
+    for (size_t i = 0; i < vec.size(); i++)
+    {
         if (i == _highlight) attrOn(A_REVERSE);
         print(x, y+i, vec[i].c_str());
         attrOff(A_REVERSE);
     }
 }
 
-void Screen::textSelection(str_vec_c vec, function<void(int, str_vec_c)> func) {
+void Screen::textSelection(
+    str_vec_c vec, function<void(int, str_vec_c)> func)
+{
     ErrorVector(vec, false);
 
-    for (size_t i = 0; i < vec.size(); i++) {
-        if (i == _highlight) attrOn(A_REVERSE);
+    for (size_t i = 0; i < vec.size(); i++)
+    {
+        if (i == _highlight) 
+        {
+            attrOn(A_REVERSE);
+        }
         func(i, vec);
         attrOff(A_REVERSE);
     }
 }
 
-template<typename T> void Screen::textSelectionTable(const vector<vector<T>> tableVec, function<void(int, int)> func) {
+template<typename T> void Screen::textSelectionTable(
+    const vector<vector<T>> tableVec, function<void(int, int)> func)
+{
     ErrorVector(tableVec, true);
 
-    for (size_t i = 0; i < tableVec.size(); i++) {
-        for (size_t j = 0; j < tableVec[i].size(); j++) {
-            if (j == _highlightX && i == _highlightY) {
+    for (size_t i = 0; i < tableVec.size(); i++)
+    {
+        for (size_t j = 0; j < tableVec[i].size(); j++)
+        {
+            if (j == _highlightX && i == _highlightY)
+            {
                 attrOn(A_REVERSE);
             }
 
-            if (i == 0 || j == 0) { func(i, j); }
-            else                  { func(i, j); }
+            if (i == 0 || j == 0)
+            { 
+                func(i, j);
+            }
+            else
+            {
+                func(i, j);
+            }
 
             attrOff(A_REVERSE);
         }
     }
 }
 
-Screen* Screen::createWindow(int_c x, int_c y, int_c width, int_c height) {
+Screen* Screen::createWindow(int_c x, int_c y, int_c width, int_c height)
+{
     WINDOW* WIN = newwin(y, x, height, width);
     return new Screen(WIN, x, y);
 }
 
 Screen::Screen(WINDOW* win, int_c x, int_c y)
-        : win(win), x(x), y(y) {
+    : win(win), x(x), y(y)
+{
     _highlight = 0;
     _highlightX = 0;
     _highlightY = 0;
 }
+
+Screen::Screen(const Screen &other) 
+    : x(other.x), y(other.y), _choice(other._choice)
+    , _highlight(other._highlight), _highlightX(other._highlightX)
+    , _highlightY(other._highlightY)
+    , win(!other.win? new WINDOW(*other.win) : nullptr) {}
+
+Screen::Screen(Screen &&other) noexcept 
+    : x(0), y(0), _choice(0), _highlight(0)
+    , _highlightX(0), _highlightY(0), win(nullptr) 
+{
+    x = other.x;
+    y = other.y;
+    _choice = other._choice;
+    _highlight = other._highlight;
+    _highlightX = other._highlightX;
+    _highlightY = other._highlightY;
+    win = other.win;
+
+    other.x = 0;
+    other.y = 0;
+    other._choice = 0;
+    other._highlight = 0;
+    other._highlightX = 0;
+    other._highlightY = 0;
+    other.win = nullptr;
+}
+
+Screen& Screen::operator=(const Screen &other)
+{
+    if (this != &other)
+    {
+        if (!win)
+        {
+            win = new WINDOW(*other.win);
+        }
+        else 
+        {
+            win = nullptr;
+        }
+
+        x = other.x;
+        y = other.y;
+        _choice = other._choice;
+        _highlight = other._highlight;
+        _highlightX = other._highlightX;
+        _highlightY = other._highlightY;
+    }
+
+    return *this;
+}
+
+Screen& Screen::operator=(Screen &&other) noexcept
+{
+    if (this != &other)
+    {
+        win = nullptr;
+
+        x = other.x;
+        y = other.y;
+        _choice = other._choice;
+        _highlight = other._highlight;
+        _highlightX = other._highlightX;
+        _highlightY = other._highlightY;
+
+        other.x = 0;
+        other.y = 0;
+        other._choice = 0;
+        other._highlight = 0;
+        other._highlightX = 0;
+        other._highlightY = 0;
+        other.win = nullptr;
+
+    }
+
+    return *this;
+}
+
 
 Screen::~Screen() { delwin(win); }
 

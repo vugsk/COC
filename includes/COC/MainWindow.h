@@ -10,10 +10,32 @@ namespace IOSys {
 
 class Screen {
 public:
-    Screen(const Screen &)            = delete;
-    Screen(Screen &&)                 = delete;
-    Screen &operator=(const Screen &) = delete;
-    Screen &operator=(Screen &&)      = delete;
+    /**
+     * @brief Конструктор копирования
+     * 
+     * @param other 
+     */
+    Screen(const Screen &other);
+    /**
+     * @brief конструктор перемещения
+     * 
+     * @param other 
+     */
+    Screen(Screen &&other) noexcept;
+    /**
+     * @brief приравнивание 
+     * 
+     * @param other 
+     * @return Screen& 
+     */
+    Screen &operator=(const Screen &other);
+    /**
+     * @brief приравнивание перемещения
+     * 
+     * @param other 
+     * @return Screen& 
+     */
+    Screen &operator=(Screen &&other) noexcept;
     Screen(WINDOW* win=stdscr, int_c x=getmaxx(stdscr), int_c y=getmaxy(stdscr));
     ~Screen();
     
@@ -57,6 +79,7 @@ public:
     void textSelection(str_vec_c vec, int_c x, int_c y);
     void textSelection(str_vec_c vec, function<void(int, str_vec_c)> func);
     template<typename T> void textSelectionTable(const vector<vector<T>> tableVec, function<void(int, int)> func);
+    
     Screen* createWindow(int_c x, int_c y, int_c width, int_c height);
 
 private:
