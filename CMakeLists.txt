@@ -19,6 +19,7 @@ endif()
 
 include_directories(includes/COC)
 # file(GLOB SRC_ROOT src/*.cpp)
+
 set(SRC_ROOT 
     src/MainWindow.cpp 
     src/MainWindow.cpp

@@ -1,6 +1,8 @@
 
 #include "MainWindow.h"
 
+#include <cstring>
+
 #include "Config.h"
 #include "ErrorTest.h"
 
@@ -19,7 +21,7 @@ inline void IOSys::scan(
     vw_scanw(window, str, args);
 }
 
-using std::exit;
+
 
 inline bool_c conditionMoreOrLess(
     int_c cheackNum, int_c maxNumOrMinNum, bool_c sign)
@@ -30,81 +32,108 @@ inline bool_c conditionMoreOrLess(
 inline bool_c ConditionWithAnOrOrAndSign(
     int_c cheackNum, int_c minNum, int_c maxNum, bool_c sign)
 {
-    return sign ? conditionMoreOrLess(cheackNum, minNum, false) && conditionMoreOrLess(cheackNum, maxNum, true) : 
-                  conditionMoreOrLess(cheackNum, minNum, false) || conditionMoreOrLess(cheackNum, maxNum, true);
+    return sign ?  conditionMoreOrLess(
+                    cheackNum, minNum, false)
+                && conditionMoreOrLess(
+                    cheackNum, maxNum, true)
+                :  conditionMoreOrLess(
+                    cheackNum, minNum, false)
+                || conditionMoreOrLess(
+                    cheackNum, maxNum, true);
 }
 
-template <typename T1, typename T2, typename T3, typename T4>
-void Screen::cheackError(
-    function<void(T1, T2, T3, T4)> func, T1 t1, T2 t2, T3 t3, T4 t4)
+
+
+template <typename Function>
+void Screen::cheackError(Function func)
 {
     try
     {
-        func(t1, t2, t3, t4);
+        func();
     } 
-    catch (exception &ex)
+    catch (std::exception &ex)
     {
         print("%s \n", ex.what());
         exit(EXIT_FAILURE);
     }
 }
 
-void Screen::ErrorSize(int_c size, bool_c ifSizeXY, int_c sizeAdditionally)
+void functionCheackErrorSize(
+    int_c size, bool_c ifSizeXY, int_c sizeAdditionally)
 {
-    cheackError<int_c, bool_c, int_c, int_c>(
-        [this](int_c size, bool_c ifSizeXY, int_c sizeAdditionally, 
-        int_c io) 
+    if (ifSizeXY)
     {
-        
-        if (ifSizeXY) {
-            if (sizeAdditionally < -1 || !sizeAdditionally) 
-            {
-                throw ErrorSizeLessThanZero();
-            }
-        }
-        if (size < -1 || !size) 
+        if (sizeAdditionally < -1 || !sizeAdditionally) 
         {
             throw ErrorSizeLessThanZero();
-        } 
-    
-    }, size, ifSizeXY, sizeAdditionally, 0);
+        }
+    }
+    if (size < -1 || !size) 
+    {
+        throw ErrorSizeLessThanZero();
+    } 
+}
+
+void Screen::functionCheackErrorXY(int_c x, int_c y, int_c finishX, int_c finishY)
+{
+    if (finishX && finishY)
+    {
+        if (conditionMoreOrLess(
+                finishX, this->x, true) || 
+            conditionMoreOrLess(
+                finishY, this->y, true))
+        {
+            throw ::ErrorXY();
+        }
+    }
+
+    if (ConditionWithAnOrOrAndSign(
+            x, -1, this->x, true) ||
+        ConditionWithAnOrOrAndSign(
+            y, -1, this->y, true))
+    {
+        throw ::ErrorXY();
+    }
+}
+
+template<typename T>
+void functionCheackErrorVector(std::vector<T> vec, bool_c ifT_vector)
+{
+    if (ifT_vector) {
+        for (typename std::vector<T>::iterator i = vec.begin(); 
+                i != vec.end(); ++i)
+        {
+            if (!strlen(*i)) throw ErrorVectorEmpty(); 
+        }
+    }
+    if (vec.empty()) throw ErrorVectorEmpty();
+}
+
+void Screen::ErrorSize(int_c size, bool_c ifSizeXY, int_c sizeAdditionally)
+{
+    cheackError
+    (
+        std::bind(functionCheackErrorSize, size, 
+            ifSizeXY, sizeAdditionally)
+    );
 }
 
 void Screen::ErrorXY(int_c x, int_c y, int_c finishX, int_c finishY)
 {
-    cheackError<int_c, int_c, int_c, int_c>(
-        [this](int_c x, int_c y, int_c finishX, int_c finishY) 
-    {
-        if (finishX && finishY)
-        {
-            if (conditionMoreOrLess(finishX, this->x, true) || 
-                conditionMoreOrLess(finishY, this->y, true))
-            {
-                throw ::ErrorXY();
-            }
-        }
-        if (ConditionWithAnOrOrAndSign(x, -1, this->x, true) ||
-            ConditionWithAnOrOrAndSign(y, -1, this->y, true))
-        {
-            throw ::ErrorXY();
-        }
-    }, x, y, finishX, finishY);
+    cheackError
+    (
+        std::bind(&Screen::functionCheackErrorXY, *this, 
+            x, y, finishX, finishY)
+    );
 }
 
-template<typename T> void Screen::ErrorVector(
-    const vector<T> vec, bool_c ifT_vector)
+template<typename T>
+void Screen::ErrorVector(const std::vector<T> vec, bool_c ifT_vector)
 {
-    cheackError<const vector<T>, bool_c, int_c, int_c>(
-        [this](const vector<T> vec, bool_c ifT_vector, int_c finishX, 
-        int_c finishY)
-    {
-        if (ifT_vector) {
-            for (size_t i = 0; i < vec.size(); i++) {
-                if (vec[i].empty()) throw ErrorVectorEmpty(); 
-            }
-        }
-        if (vec.empty()) throw ErrorVectorEmpty();
-    }, vec, ifT_vector, 0, 0);
+    cheackError
+    (
+        std::bind(functionCheackErrorVector<T>, vec, ifT_vector)
+    );
 }
 
 
@@ -117,7 +146,6 @@ int_c Screen::getHighlightX() { return _highlightX; }
 int_c Screen::getHighlightY() { return _highlightY; }
 
 void Screen::setHighlight(int_c highlight) { _highlight = highlight; }
-
 
 void Screen::clear() { wclear(win); }
 void Screen::refresh() { wrefresh(win); }
@@ -133,9 +161,14 @@ void Screen::keypad(bool_c key) { ::keypad(win, key); }
 
 void Screen::cheackColorSupport()
 {
-    try {
-        if (!has_colors()) throw ErrorColorSupport();
-    } catch (exception &ex) {
+    try
+    {
+        if (!has_colors()) 
+        {
+            throw ErrorColorSupport();
+        }
+    }
+    catch (std::exception &ex) {
         print("%s \n", ex.what());
         exit(EXIT_FAILURE);
     }
@@ -186,7 +219,7 @@ void Screen::scan(int_c x, int_c y, char_c *str, ...)
 }
 
 int_c Screen::ifTheWsOrAdButtonIsPressed(
-    int_vec_c button, int highlight, int size)
+    int_c* button, int highlight, int size)
 {
     if ((_choice == button[0]) || (_choice == button[1]))
     {
@@ -227,25 +260,19 @@ void Screen::wsOrAdButton(int_c size, bool_c WS_or_AD)
     ErrorSize(size);
     getChar();
 
-    int_pair_vec button_WS_or_AD;
+    ButtonMove test1;
     if (WS_or_AD) 
     {
-        button_WS_or_AD = {
-            {KEY_W, UP}, 
-            {KEY_S, DOWN}
-        };
+        test1 = { _UP, _DOWN };
     }
     else 
     {
-        button_WS_or_AD = {
-            {KEY_A, LEFT}, 
-            {KEY_D, RIGHT}
-        };
+        test1 = { _LEFT, _RIGHT };
     }
     
-    _highlight = ifTheWsOrAdButtonIsPressed(button_WS_or_AD.second, 
+    _highlight = ifTheWsOrAdButtonIsPressed(test1.getKeyDown(), 
         _highlight, size);
-    _highlight = ifTheWsOrAdButtonIsPressed(button_WS_or_AD.first, 
+    _highlight = ifTheWsOrAdButtonIsPressed(test1.getKeyUp(), 
         _highlight);
 }
 
@@ -254,19 +281,16 @@ void Screen::wasdButton(int_c size_x, int_c size_y)
     ErrorSize(size_x, true, size_y);
     getChar();
 
-    int_vec_pair_vec button_WASD{
-        {{KEY_W, UP}, {KEY_S, DOWN}}, 
-        {{KEY_A, LEFT}, {KEY_D, RIGHT}}
-    };
+    std::vector<ButtonMove> WASD = {{_UP, _DOWN}, {_LEFT, _RIGHT} };
 
-    _highlightY = ifTheWsOrAdButtonIsPressed(button_WASD[0].second, 
+    _highlightY = ifTheWsOrAdButtonIsPressed(WASD[0].getKeyDown(), 
         _highlightY, size_y);
-    _highlightY = ifTheWsOrAdButtonIsPressed(button_WASD[0].first, 
+    _highlightY = ifTheWsOrAdButtonIsPressed(WASD[0].getKeyUp(), 
         _highlightY);
 
-    _highlightX = ifTheWsOrAdButtonIsPressed(button_WASD[1].second, 
+    _highlightX = ifTheWsOrAdButtonIsPressed(WASD[1].getKeyDown(), 
         _highlightX, size_x);
-    _highlightX = ifTheWsOrAdButtonIsPressed(button_WASD[1].first, 
+    _highlightX = ifTheWsOrAdButtonIsPressed(WASD[1].getKeyUp(), 
         _highlightX);
 }
 
@@ -351,13 +375,13 @@ void Screen::textSelection(str_vec_c vec, int_c x, int_c y)
     for (size_t i = 0; i < vec.size(); i++)
     {
         if (i == _highlight) attrOn(A_REVERSE);
-        print(x, y+i, vec[i].c_str());
+        print(x, y+i, vec[i]);
         attrOff(A_REVERSE);
     }
 }
 
 void Screen::textSelection(
-    str_vec_c vec, function<void(int, str_vec_c)> func)
+    str_vec_c vec, std::function<void(int, str_vec_c)> func)
 {
     ErrorVector(vec, false);
 
@@ -372,8 +396,10 @@ void Screen::textSelection(
     }
 }
 
-template<typename T> void Screen::textSelectionTable(
-    const vector<vector<T>> tableVec, function<void(int, int)> func)
+template<typename T>
+void Screen::textSelectionTable(
+    const std::vector<std::vector<T>> tableVec, 
+    std::function<void(int, int)> func)
 {
     ErrorVector(tableVec, true);
 

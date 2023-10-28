@@ -3,10 +3,8 @@
 
 #include <exception>
 
-using std::exception;
-
 //* GOOD
-class ErrorOutput : public exception {
+class ErrorOutput : public std::exception {
 public:
     ErrorOutput &operator=(const ErrorOutput &) = delete;
     ErrorOutput &operator=(ErrorOutput &&)      = delete;
@@ -17,7 +15,7 @@ public:
 };
 
 //* GOOD
-class ErrorXY : public exception {
+class ErrorXY : public std::exception {
 public:
     ErrorXY &operator=(const ErrorXY &) = delete;
     ErrorXY &operator=(ErrorXY &&)      = delete;
@@ -28,7 +26,7 @@ public:
 };
 
 //* GOOD
-class ErrorColorSupport : public exception {
+class ErrorColorSupport : public std::exception {
 public:
     ErrorColorSupport &operator=(const ErrorColorSupport &) = delete;
     ErrorColorSupport &operator=(ErrorColorSupport &&)      = delete;
@@ -39,7 +37,7 @@ public:
 };
 
 //* GOOD
-class ErrorSizeLessThanZero : public exception {
+class ErrorSizeLessThanZero : public std::exception {
 public:
     ErrorSizeLessThanZero &operator=(const ErrorSizeLessThanZero &) = delete;
     ErrorSizeLessThanZero &operator=(ErrorSizeLessThanZero &&)      = delete;
@@ -50,7 +48,7 @@ public:
 };
 
 //* GOOD
-class ErrorVectorEmpty : public exception {
+class ErrorVectorEmpty : public std::exception {
 public:
     ErrorSizeLessThanZero &operator=(const ErrorSizeLessThanZero &) = delete;
     ErrorSizeLessThanZero &operator=(ErrorSizeLessThanZero &&)      = delete;

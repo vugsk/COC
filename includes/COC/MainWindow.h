@@ -74,11 +74,17 @@ public:
  
     void wsOrAdButton(int_c size, bool_c WS_or_AD = true);
     void wasdButton(int_c size_x, int_c size_y);
-    void clearWin(int_c start_x, int_c start_y, int_c finish_x, int_c finish_y);
+    void clearWin(int_c start_x, int_c start_y, 
+        int_c finish_x, int_c finish_y);
     void drawWall(int wall_x, int wall_y, bool_c drawWallXOrY = true); 
     void textSelection(str_vec_c vec, int_c x, int_c y);
-    void textSelection(str_vec_c vec, function<void(int, str_vec_c)> func);
-    template<typename T> void textSelectionTable(const vector<vector<T>> tableVec, function<void(int, int)> func);
+
+    void textSelection(str_vec_c vec, 
+        std::function<void(int, str_vec_c)> func);
+    
+    template<typename T> 
+    void textSelectionTable(const std::vector<std::vector<T>> tableVec, 
+                            std::function<void(int, int)> func);
     
     Screen* createWindow(int_c x, int_c y, int_c width, int_c height);
 
@@ -90,12 +96,18 @@ private:
     int _highlightX;
     int _highlightY;
 
-    int_c ifTheWsOrAdButtonIsPressed(int_vec_c button, int highlight, int size=0);
+    int_c ifTheWsOrAdButtonIsPressed(int_c* button, int highlight, 
+        int size=0);
     void ErrorXY(int_c x, int_c y, int_c finishX=0, int_c finishY=0);
-    template<typename T> void ErrorVector(const vector<T> vec, bool_c ifT_vector);
-    void ErrorSize(int_c size, bool_c ifSizeXY=false, int_c sizeAdditionally=0);
+    template<typename T> 
+    void ErrorVector(const std::vector<T> vec, bool_c ifT_vector);
+    void ErrorSize(int_c size, bool_c ifSizeXY=false, 
+        int_c sizeAdditionally=0);
     
-    template<typename T1, typename T2, typename T3, typename T4>
-    void cheackError(function<void(T1, T2, T3, T4)> func, T1 t1, T2 t2, T3 t3, T4 t4);
+    template<typename Function>
+    void cheackError(Function func);
+
+    void functionCheackErrorXY(int_c x, int_c y, 
+        int_c finishX, int_c finishY);
 };
 

@@ -2,28 +2,48 @@
 #pragma once
 
 #include <curses.h>
-#include <vector>
 #include <functional>
+
 
 #include "ConverterTyptData.h"
 
-using std::vector;
-using std::pair;
-using std::function;
+
+//* TYPE DATA
 
 typedef const int  int_c;
 typedef const bool bool_c;
+typedef const std::vector<char_c*> str_vec_c;
 
-typedef       vector<int>                  int_vec;
-typedef       vector<string>               str_vec;
-typedef const vector<int>                  int_vec_c;
-typedef const vector<string>               str_vec_c;
-typedef const vector<pair<char_c, char_c>> vec_pair_c;
-typedef       pair<int_vec, int_vec>       int_pair_vec;
-typedef       vector<int_pair_vec>         int_vec_pair_vec;
+class ButtonMove {
+public:
+    ButtonMove(int_c* KeyUp=nullptr, int_c* KeyDown=nullptr);
+    ButtonMove(const ButtonMove &other);
+    ButtonMove(ButtonMove &&other) noexcept;
+    ButtonMove &operator=(const ButtonMove &other);
+    ButtonMove &operator=(ButtonMove &&other) noexcept;
+    ~ButtonMove();
+        
+    int_c* getKeyUp();
+    int_c* getKeyDown();
+
+private:
+    int_c* KeyUp;
+    int_c* KeyDown;
+};
 
 
-enum Color {
+//* STYLE
+#define WALL_Y_PERPENDICULAR "│"
+#define WALL_Y_ANGLE_UNDER_90_DOWN "┬"
+#define WALL_Y_ANGLE_UNDER_90_TOP "┴"
+
+#define WALL_X_IN_PARALLEL "─"
+#define WALL_X_ANGLE_UNDER_90_LEFT "├"
+#define WALL_X_ANGLE_UNDER_90_RIGHT "┤"
+
+
+enum Color
+{
     BLACK,
     RED,
     GREEN,
@@ -33,24 +53,6 @@ enum Color {
     CYAN,
     WHITE,
 };
-
-#define WALL_Y_PERPENDICULAR "│"
-#define WALL_Y_ANGLE_UNDER_90_DOWN "┬"
-#define WALL_Y_ANGLE_UNDER_90_TOP "┴"
-
-#define WALL_X_IN_PARALLEL "─"
-#define WALL_X_ANGLE_UNDER_90_LEFT "├"
-#define WALL_X_ANGLE_UNDER_90_RIGHT "┤"
-
-#define SIMBEL 127
-vec_pair_c CODE_KEYS = {
-    {'a', 'A'}, {'b', 'B'}, {'c', 'C'}, {'d', 'D'}, {'e', 'E'}, {'f', 'F'},
-    {'g', 'G'}, {'h', 'H'}, {'i', 'I'}, {'j', 'J'}, {'k', 'K'}, {'l', 'L'},
-    {'m', 'M'}, {'n', 'N'}, {'o', 'O'}, {'p', 'P'}, {'q', 'Q'}, {'r', 'R'},
-    {'s', 'S'}, {'t', 'T'}, {'u', 'U'}, {'v', 'V'}, {'w', 'W'}, {'x', 'X'},
-    {'y', 'Y'}, {'z', 'Z'}
-};
-
 
 // Движение
 #define DOWN KEY_DOWN   // стрелка вниз
@@ -70,4 +72,10 @@ vec_pair_c CODE_KEYS = {
 
 #define ESC 27
 #define ENTER 10
+
+
+int_c _UP[]    {KEY_W, UP};
+int_c _DOWN[]  {KEY_S, DOWN};
+int_c _LEFT[]  {KEY_A, LEFT}; 
+int_c _RIGHT[] {KEY_D, RIGHT};
 
